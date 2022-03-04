@@ -1,6 +1,5 @@
-const moment = require('moment');
-const { MellatGateway, MellatResCode } = require('./mellat');
-const { MelliGateway, MelliResCode, MelliVerifyResCode } = require('./melli');
+const mellatGateway = require('./mellat');
+const melliGateway = require('./melli');
 const Types = Object.freeze({ Mellat: 'mellat', Melli: 'melli' });
 
 let config = {
@@ -32,24 +31,24 @@ module.exports = (conf) => {
     config,
     request: (gatewayType, amount, additionalData = '') => {
       if (gatewayType == Types.Mellat)
-        return MellatGateway.request(amount, config.mellat);
+        return mellatGateway.request(amount, config.mellat);
       if (gatewayType == Types.Melli)
-        return MelliGateway.request(amount,config.melli);
+        return melliGateway.request(amount,config.melli);
     },
     verify: (gatewayType, param) => {
       if (gatewayType == Types.Mellat) {
-        return MellatGateway.verify(param, config.mellat);
+        return mellatGateway.verify(param, config.mellat);
       }
       if (gatewayType == Types.Melli) {
-        return MelliGateway.verify(param.token, config.melli);
+        return melliGateway.verify(param.token, config.melli);
       }
     },
     refund: (gatewayType, param) => {
       if (gatewayType == Types.Mellat) {
-        return MellatGateway.refund(param, config.mellat);
+        return mellatGateway.refund(param, config.mellat);
       }
       if (gatewayType == Types.Melli) {
-        return MelliGateway.refund(param, config.melli);
+        return melliGateway.refund(param, config.melli);
       }
     },
   };

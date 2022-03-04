@@ -1,5 +1,5 @@
 const moment = require('moment');
-const messages = require('./code');
+const MESSAGES = require('./code');
 const helper = require('./helper');
 
 module.exports = {

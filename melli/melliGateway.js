@@ -1,6 +1,6 @@
 const helper = require('./helper');
 const moment = require('moment');
-const { RequestResCode, VerifyResCode } = require('.');
+const MESSAGES = require('./codes');
 
 module.exports = {
   request: (amount, config) => {
@@ -23,18 +23,13 @@ module.exports = {
       helper
         .getToken(data)
         .then((result) => {
-          return resolve({
-            success: true,
-            message: RequestResCode[result.ResCode],
+          resolve({
+            success: result.ResCode == 0,
+            message: MESSAGES.PaymentRequest[result.ResCode],
             ...result,
-            // ResCode: result.ResCode,
-            // RefId: result.Token,
-            // redirectURL: `https://sadad.shaparak.ir/VPG/Purchase?Token=${result.Token}`,
           });
         })
-        .catch((error) => {
-          return reject({ err: true, error });
-        });
+        .catch((error) => reject(error));
     });
   },
 
@@ -47,20 +42,13 @@ module.exports = {
       helper
         .verifyPayment(verifyData)
         .then((result) => {
-          if (result.ResCode.toString() === '0') {
-            return resolve({
-              success: true,
-              ...result,
-            });
-          } else {
-            return resolve({
-              success: false,
-              message: VerifyResCode[result.ResCode],
-              ...result,
-            });
-          }
+          resolve({
+            success: result.ResCode == 0,
+            message: MESSAGES.Verify[result.ResCode],
+            ...result,
+          });
         })
-        .catch((error => reject({ err: true, error })));
+        .catch((error) => reject(error));
     });
   },
 
@@ -87,7 +75,7 @@ module.exports = {
       helper
         .registerRefund(data)
         .then((dt) => {
-          if (dt && dt.ResponseCode.toString() == '1010') {
+          if (dt && dt.ResponseCode == 1010) {
             let nextSignData = helper.encryptPkcs7(
               `${dt.RefundId}`,
               config.credentail.TerminalKey
@@ -96,9 +84,10 @@ module.exports = {
             helper
               .confirmRefund(nextData)
               .then((result) => {
-                if (result && result.ResponseCode.toString() == '1010') {
+                if (result && result.ResponseCode == 1010) {
                   return resolve({
                     success: true,
+                    message: MESSAGES.refund[result.ResponseCode],
                     ...result,
                   });
                 } else {
@@ -106,24 +95,18 @@ module.exports = {
                     .cancelRefund(nextData)
                     .then((nextResult) => {
                       return resolve({
-                        success:true,
+                        success: true,
+                        message: MESSAGES.refund[result.ResponseCode],
                         ...nextResult,
                       });
                     })
-                    .catch((error) => {
-                      return reject({ err: true, error });
-                    });
+                    .catch((error) => reject(error));
                 }
               })
-              .catch((error) => {
-                return reject({ err: true, error });
-              });
+              .catch((error) => reject(error));
           }
         })
-        .catch((error) => {
-          return reject({ err: true, error });
-        });
+        .catch((error) => reject(error));
     });
   },
 };
-
