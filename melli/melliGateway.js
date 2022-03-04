@@ -1,5 +1,5 @@
-const helper = require('./helper');
 const moment = require('moment');
+const helper = require('./helper');
 const MESSAGES = require('./codes');
 
 module.exports = {
@@ -7,7 +7,7 @@ module.exports = {
     return new Promise((resolve, reject) => {
       let Amount = config.amountIsToman ? amount * 10 : amount;
       let orderId = Number(moment().format('YMMDDHHmmSS'));
-      let signData = helper.encryptPkcs7(
+      let signData = helper.signingData(
         `${config.credentail.TerminalId};${orderId};${Amount}`,
         config.credentail.TerminalKey
       );
@@ -21,7 +21,7 @@ module.exports = {
         OrderId: orderId,
       };
       helper
-        .getToken(data)
+        .requestPayment(data)
         .then((result) => {
           resolve({
             success: result.ResCode == 0,
@@ -37,7 +37,7 @@ module.exports = {
     return new Promise((resolve, reject) => {
       let verifyData = {
         Token: token,
-        SignData: helper.encryptPkcs7(token, config.credentail.TerminalKey),
+        SignData: helper.signingData(token, config.credentail.TerminalKey),
       };
       helper
         .verifyPayment(verifyData)
@@ -58,7 +58,7 @@ module.exports = {
       let RefundAmount = config.amountIsToman
         ? param.refundAmount * 10
         : param.refundAmount;
-      let signData = helper.encryptPkcs7(
+      let signData = helper.signingData(
         `${param.saleRetrivalRef};${Amount};${config.credentail.TerminalId};${param.saleReferenceId};${RefundAmount};${param.token}`,
         config.credentail.TerminalKey
       );
@@ -76,7 +76,7 @@ module.exports = {
         .registerRefund(data)
         .then((dt) => {
           if (dt && dt.ResponseCode == 1010) {
-            let nextSignData = helper.encryptPkcs7(
+            let nextSignData = helper.signingData(
               `${dt.RefundId}`,
               config.credentail.TerminalKey
             );

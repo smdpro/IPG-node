@@ -19,6 +19,7 @@
   "homepage": "https://github.com/smdpro/IPG-node#readme",
   "dependencies": {
     "axios": "^0.24.0",
+    "crypto-js": "^4.1.1",
     "moment": "^2.29.1",
     "soap": "^0.43.0"
   }

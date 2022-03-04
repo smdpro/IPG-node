@@ -1,115 +1,84 @@
-// const {MCrypt} = require('mcrypt')
-const request = require('request');
-const crypto = require('crypto');
-const requester = (url, data) => {
-  const options = {
-    method: 'POST',
-    url: url,
-    headers: {
-      'Content-Length': JSON.stringify(data).length,
-      'Content-Type': 'application/json',
-    },
-    body: data,
-    json: true,
-  };
+const axios = require('axios');
+const CryptoJS = require('crypto-js');
 
-  return new Promise((resolve, reject) => {
-    request(options, function (error, response, body) {
-      if (error) {
-        reject(new Error(error));
-      } else {
-        resolve(body);
-      }
-    });
-  });
+const signingData = (str, key) => {
+  let keyHex = CryptoJS.enc.Base64.parse(key);
+  return CryptoJS.TripleDES.encrypt(str, keyHex, {
+    iv: keyHex,
+    mode: CryptoJS.mode.ECB,
+    padding: CryptoJS.pad.Pkcs7,
+  }).toString();
 };
-/**
- * @private
- * @module module:helper
- * @type {object}
- */
-const helper = (module.exports = {
-  // eslint-disable-line no-unused-vars
-  /**
-   *@private
-   * @memberOf module:helper
-   * @param {string}str
-   * @param {string}key
-   * @return {string}
-   */
-  encryptPkcs7: (str, key) => {
-    let cipher = crypto.createCipheriv(
-      'des-ede3',
-      Buffer.from(key, 'base64'),
-      ''
-    );
 
-    let encryptedData = Buffer.concat([
-      cipher.update(str, 'utf8'),
-      cipher.final(),
-    ]);
-    return encryptedData.toString('base64');
+const hmacSHA256 = (data, key) =>
+  CryptoJS.enc.Base64.stringify(
+    CryptoJS.HmacSHA256(data, CryptoJS.enc.Base64.parse(key))
+  );
 
-    // let encryptedData =
-    //   cipher.update(str, 'utf8', 'base64') + cipher.final('base64');
-
-    // return encryptedData;
-  },
-  // encryptPkcs7: (str, key) => {
-  // 	const tripleDESEcb = new MCrypt('tripledes', 'ecb')
-  // 	const Key = Buffer.from(key, 'base64')
-  // 	const blockSize = tripleDESEcb.getBlockSize()
-  // 	const extraPad = blockSize - (str.length % blockSize)
-  // 	const targetStr = str + Array(extraPad)
-  // 		.fill(String.fromCharCode(extraPad)).join('')
-  // 	tripleDESEcb.open(Key)
-  // 	return tripleDESEcb.encrypt(targetStr).toString('base64')
-  // },
-  /**
-   * @private
-   * @memberOf module:helper
-   * @param config
-   * @return {boolean}
-   */
-  validateConfig: (config) => {
-    const validVerbs = ['key', 'merchantId', 'terminalId', 'returnUrl'];
-    const configs = Object.entries(config);
-    if (configs.length !== 4) {
-      return false;
-    } else {
-      return configs.reduce((p, item) => {
-        // validate verb
-        p = p && validVerbs.indexOf(item[0]) !== -1;
-        // validate value
-        p = p && typeof item[1] === 'string' && item[1].length !== 0;
-        return p;
-      }, true);
-    }
-  },
-
-  getToken: (data) => {
-    return requester(
-      'https://sadad.shaparak.ir/api/v0/Request/PaymentRequest',
-      data
-    );
+module.exports = {
+  signingData,
+  requestPayment: (data) => {
+    return axios({
+      method: 'post',
+      url: 'https://sadad.shaparak.ir/api/v0/Request/PaymentRequest',
+      headers: {
+        'Content-Length': JSON.stringify(data).length,
+        'Content-Type': 'application/json',
+      },
+      data,
+    });
   },
 
   verifyPayment: (data) => {
-    return requester(
-      'https://sadad.shaparak.ir/api/v0/Advice/Verify',
-      data
-    );
+    return axios({
+      method: 'post',
+      url: 'https://sadad.shaparak.ir/api/v0/Advice/Verify',
+      headers: {
+        'Content-Length': JSON.stringify(data).length,
+        'Content-Type': 'application/json',
+      },
+      data,
+    });
   },
-  registerRefund: (data) => {
-    return requester(
-      'https://refund.sadadpsp.ir/api/v0/Refund/Register',
-      data
-    );
+  registerRefund: (data, key) => {
+    let dataToSign = `${data.RetrievalRefNo};${data.Amount};${data.TerminalId};${data.SystemTraceNo};${data.RefundAmount};${data.Token}`;
+    return axios({
+      method: 'post',
+      url: 'https://refund.sadadpsp.ir/api/v1/refund/Register',
+      headers: {
+        'Content-Type': 'application/json',
+        'Sign-Data': `${hmacSHA256(dataToSign, key)}`,
+        // Sign: `${signWithPrivateKey(dataToSign)}`,
+      },
+      data,
+    });
   },
-  confirmRefund: (data) => {
-    return requester('https://refund.sadadpsp.ir/api/v0/Refund/Confirm', data);
+  confirmRefund: (data, key) => {
+    let signData = `${data.RefundId}`;
+    return axios({
+      method: 'post',
+      url: 'https://refund.sadadpsp.ir/api/v1/refund/Confirm',
+      headers: {
+        'Content-Length': JSON.stringify(data).length,
+        'Content-Type': 'application/json',
+        'Sign-Data': hmacSHA256(signData, key),
+        //Sign: signWithPrivateKey(signData),
+      },
+      data,
+    });
   },
-  cancelRefund: (data) => {
-    return requester('https://refund.sadadpsp.ir/api/v0/Refund/Cancel', data);
+  cancelRefund: (data, key) => {
+    let signData = `${data.RefundId}`;
+    return axios({
+      method: 'post',
+      url: 'https://refund.sadadpsp.ir/api/v1/refund/Cancel',
+      headers: {
+        'Content-Length': JSON.stringify(data).length,
+        'Content-Type': 'application/json',
+        'Sign-Data': hmacSHA256(signData, key),
+        //Sign: signWithPrivateKey(signData),
+      },
+      data,
+    });
   },
-});
+};
