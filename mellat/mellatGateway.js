@@ -17,14 +17,18 @@ module.exports = {
       };
       helper
         .client()
-        .then(function (client) {
+        .then((client)=> {
           client.bpPayRequest(
             params,
             (err, data) => {
               if (err) return reject(err);
               var res = data.return.split(',');
-              if (res[0] != 0) return reject({ errorCode: res[0] });
-              resolve({ ResCode: res[0], RefId: res[1] });
+              if (res[0] != 0) return reject({
+                success: false,
+                ResCode: res[0],
+                message: MESSAGES[res[0]],
+              });
+              resolve({success:true, ResCode: res[0], RefId: res[1] });
             },
             { ignoredNamespaces: { namespaces: [], override: true } }
           );

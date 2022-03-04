@@ -2,26 +2,26 @@ const mellatGateway = require('./mellat');
 const melliGateway = require('./melli');
 const Types = Object.freeze({ Mellat: 'mellat', Melli: 'melli' });
 
-let config = {
-  mellat: {
-    credentail: {
-      terminalId: MELLAT.TERMINAL,
-      userName: MELLAT.USERNAME,
-      userPassword: MELLAT.PASSWORD,
-    },
-    callbackUrl: '',
-    amountIsToman: false,
-  },
-  melli: {
-    credentail: {
-      TerminalId: '',
-      MerchantId: '',
-      TerminalKey: '',
-    },
-    callbackUrl: '',
-    amountIsToman: false,
-  },
-};
+// let config = {
+//   mellat: {
+//     credentail: {
+//       terminalId: '',
+//       userName: '',
+//       userPassword: '',
+//     },
+//     callbackUrl: '',
+//     amountIsToman: false,
+//   },
+//   melli: {
+//     credentail: {
+//       TerminalId: '',
+//       MerchantId: '',
+//       TerminalKey: '',
+//     },
+//     callbackUrl: '',
+//     amountIsToman: false,
+//   },
+// };
 
 module.exports = (conf) => {
   if (!conf) return null;
@@ -31,7 +31,7 @@ module.exports = (conf) => {
     config,
     request: (gatewayType, amount, additionalData = '') => {
       if (gatewayType == Types.Mellat)
-        return mellatGateway.request(amount, config.mellat);
+        return mellatGateway.request(amount, config.mellat, additionalData);
       if (gatewayType == Types.Melli)
         return melliGateway.request(amount,config.melli);
     },
