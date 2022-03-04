@@ -1,0 +1,25 @@
+{
+  "name": "ipg-node",
+  "version": "1.0.0",
+  "description": "Iranian payment gateway",
+  "main": "index.js",
+  "scripts": {
+    "pub": "git add . && git commit -m \"Updates\" && npm version patch && npm run build && npm publish",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/smdpro/IPG-node.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/smdpro/IPG-node/issues"
+  },
+  "homepage": "https://github.com/smdpro/IPG-node#readme",
+  "dependencies": {
+    "axios": "^0.24.0",
+    "moment": "^2.29.1",
+    "soap": "^0.43.0"
+  }
+}
