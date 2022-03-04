@@ -102,16 +102,13 @@ module.exports = {
           client.bpRefundRequest(params, function (error, result) {
             if (error) return reject(error);
             var res = result.return.split(',');
-            if (res[0] != 0)
-              return reject({
-                errorCode: res[0],
-                message: result.return,
-              });
             resolve({
-              success: true,
+              success: res[0] == 0,
+              message: result.return,
               code: res[0],
               TransactionCode: res[1],
             });
+            
           });
         })
         .catch((error) => reject(error));
