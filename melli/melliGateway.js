@@ -5,7 +5,7 @@ const MESSAGES = require('./codes');
 module.exports = {
   request: (amount, config) => {
     return new Promise((resolve, reject) => {
-      let Amount = config.amountIsToman ? amount * 10 : amount;
+      let Amount = config.currencyIsToman ? amount * 10 : amount;
       let orderId = Number(moment().format('YMMDDHHmmSS'));
       let signData = helper.signingData(
         `${config.credentail.TerminalId};${orderId};${Amount}`,
@@ -54,12 +54,12 @@ module.exports = {
 
   refund: (param, config) => {
     return new Promise((resolve, reject) => {
-      let Amount = config.amountIsToman ? param.amount * 10 : param.amount;
-      let RefundAmount = config.amountIsToman
+      let Amount = config.currencyIsToman ? param.amount * 10 : param.amount;
+      let RefundAmount = config.currencyIsToman
         ? param.refundAmount * 10
         : param.refundAmount;
       let signData = helper.signingData(
-        `${param.saleRetrivalRef};${Amount};${config.credentail.TerminalId};${param.saleReferenceId};${RefundAmount};${param.token}`,
+        `${param.retrivalRef};${Amount};${config.credentail.TerminalId};${param.systemTraceNo};${RefundAmount};${param.token}`,
         config.credentail.TerminalKey
       );
       let data = {

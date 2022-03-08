@@ -8,7 +8,7 @@ module.exports = {
       let params = {
         ...config.credentail,
         orderId: moment().format('YMMDDHHmmSS'),
-        amount: config.amountIsToman ? amount * 10 : amount,
+        amount: config.currencyIsToman ? amount * 10 : amount,
         localDate: moment().format('YYMMDD'),
         localTime: moment().format('HHmmSS'),
         additionalData: additionalData,
@@ -101,7 +101,7 @@ module.exports = {
             resolve({
               success: res[0] == 0,
               message: result.return,
-              code: res[0],
+              ResCode: res[0],
               TransactionCode: res[1],
             });
           });
