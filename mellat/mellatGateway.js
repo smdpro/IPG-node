@@ -17,18 +17,18 @@ module.exports = {
       };
       helper
         .client()
-        .then((client)=> {
+        .then((client) => {
           client.bpPayRequest(
             params,
-            (err, data) => {
-              if (err) return reject(err);
-              var res = data.return.split(',');
-              if (res[0] != 0) return reject({
-                success: false,
+            (error, data) => {
+              if (error) return reject(error);
+              let res = data.return.split(',');
+              resolve({
+                success: res[0] == 0,
+                message: res[0] != 0 ? MESSAGES[res[0]] : undefined,
                 ResCode: res[0],
-                message: MESSAGES[res[0]],
+                RefId: res[0] == 0 ? res[1] : undefined,
               });
-              resolve({success:true, ResCode: res[0], RefId: res[1] });
             },
             { ignoredNamespaces: { namespaces: [], override: true } }
           );
@@ -47,47 +47,39 @@ module.exports = {
       helper
         .client()
         .then((client) => {
-          client.bpVerifyRequest(params, function (error, result) {
+          client.bpVerifyRequest(params, (error, result) => {
             if (error) return reject(error);
             if (result.return != 0) {
-              helper.reverse(params.saleOrderId, params.saleReferenceId);
+              helper.reverse(params);
               return resolve({ message: result.return });
             }
             helper
-              .inquiry(params.saleOrderId, params.saleReferenceId)
+              .inquiry(params)
               .then((data) => {
-                if (data.success) {
-                  helper
-                    .settle(params.saleOrderId, params.saleReferenceId)
-                    .then((data) => {
-                      if (data.success) return resolve({ success: true });
-                      helper.reverse(
-                        params.saleOrderId,
-                        params.saleReferenceId
-                      );
-                      resolve({ message: data.err });
-                    })
-                    .catch((e) => {
-                      helper.reverse(
-                        params.saleOrderId,
-                        params.saleReferenceId
-                      );
-                      reject({ message: e });
-                    });
-                } else {
-                  helper.reverse(params.saleOrderId, params.saleReferenceId);
-                  return resolve({ message: data.err });
+                if (!data.success) {
+                  helper.reverse(params);
+                  return resolve({ message: data.message });
                 }
+                helper
+                  .settle(params)
+                  .then((data) => {
+                    if (data.success) return resolve({ success: true });
+                    helper.reverse(params);
+                  })
+                  .catch((error) => {
+                    helper.reverse(params);
+                    reject({ message: error });
+                  });
               })
-              .catch((e) => {
-                helper.reverse(params.saleOrderId, params.saleReferenceId);
-                return reject({ message: e });
+              .catch((error) => {
+                helper.reverse(params);
+                return reject(error);
               });
           });
         })
-        .catch(function (err) {
-          helper.reverse(params.saleOrderId, params.saleReferenceId);
-          return reject({ message: err });
+        .catch((error) => {
+          helper.reverse(params);
+          return reject(error);
         });
     }),
 
@@ -112,7 +104,6 @@ module.exports = {
               code: res[0],
               TransactionCode: res[1],
             });
-            
           });
         })
         .catch((error) => reject(error));

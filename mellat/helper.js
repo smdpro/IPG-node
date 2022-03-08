@@ -10,76 +10,53 @@ module.exports = {
         },
         function (error, client) {
           if (error) return reject({ client: null, error });
-          else return resolve({ client, error: null });
+          resolve({ client, error: null });
         }
       );
     }),
 
-  inquiry: (saleOrderId, saleRefId) => {
+  inquiry: (params) => {
     return new Promise((resolve, reject) => {
       client()
         .then((client) => {
-          var params = {
-            terminalId: MELLAT.TERMINAL,
-            userName: MELLAT.USERNAME,
-            userPassword: MELLAT.PASSWORD,
-            orderId: saleOrderId,
-            saleOrderId: saleOrderId,
-            saleReferenceId: saleRefId,
-          };
-          client.bpInquiryRequest(params, function (error, data) {
-            if (error) return reject(error);
-            if (data.return == 0) {
-              resolve({ success: true });
-            } else {
-              return resolve({ success: false, message: result.return });
-            }
-          });
-        })
-        .catch((error) => reject(error));
-    });
-  },
-
-  settle: (saleOrderId, saleRefId) => {
-    return new Promise((resolve, reject) => {
-      helper
-        .client()
-        .then((client) => {
-          var params = {
-            terminalId: MELLAT.TERMINAL,
-            userName: MELLAT.USERNAME,
-            userPassword: MELLAT.PASSWORD,
-            orderId: saleOrderId,
-            saleOrderId: saleOrderId,
-            saleReferenceId: saleRefId,
-          };
-          client.bpSettleRequest(params, function (error, data) {
+          client.bpInquiryRequest(params, (error, data)=> {
             if (error) return reject(error);
             if (data.return == 0) return resolve({ success: true });
-            resolve({ success: false, message: data.return });
+            resolve({ success: false, message: result.return });
           });
         })
         .catch((error) => reject(error));
     });
   },
 
-  reverse: (saleOrderId, saleRefId) => {
+  settle: (params) => {
     return new Promise((resolve, reject) => {
       helper
         .client()
         .then((client) => {
-          var params = {
-            terminalId: MELLAT.TERMINAL,
-            userName: MELLAT.USERNAME,
-            userPassword: MELLAT.PASSWORD,
-            orderId: saleOrderId,
-            saleOrderId: saleOrderId,
-            saleReferenceId: saleRefId,
-          };
+          client.bpSettleRequest(params, (error, data) => {
+            if (error) return reject(error);
+            resolve({
+              success: data.return == 0,
+              message: data.return != 0 ? data.return : undefined,
+            });
+          });
+        })
+        .catch((error) => reject(error));
+    });
+  },
+
+  reverse: (params) => {
+    return new Promise((resolve, reject) => {
+      helper
+        .client()
+        .then((client) => {
           client.bpReversalRequest(params, (error, data) => {
             if (error) return reject(error);
-            if (data.return == 0) return resolve({ success: true });
-            resolve({ success: true, message: data.return });
+            resolve({
+              success: data.return == 0,
+              message: data.return != 0 ? data.return : undefined,
+            });
           });
         })
         .catch((error) => reject(error));
