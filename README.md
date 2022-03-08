@@ -8,7 +8,7 @@ Unofficially implementing Iranian payment gateways in Node.JS
 
 ## Installation
 
-Install the package from `npm` or `yarn`.
+Install the package from `npm`.
 
 ### NPM
 
@@ -20,8 +20,6 @@ npm install ipg-node
 
 ### Import and set configuration
 
-Import the package:
-
 ```javascript
 const ipg = require('ipg-node');
 
@@ -32,7 +30,7 @@ ipg.config = {
       userName: process.env.MELLAT_USERNAME,
       userPassword: process.env.MELLAT_USERPASSWORD,
     },
-    callbackUrl: 'http://your.domain.com/checkout',
+    callbackUrl: `http://your.domain.com/checkout?gate=${ipg.Types.Mellat}`,
     currencyIsToman: false,
   },
   melli: {
@@ -41,7 +39,7 @@ ipg.config = {
       MerchantId: process.env.MELLI_MERCHANTID,
       TerminalKey: process.env.MELLI_TERMINALKEY,
     },
-    callbackUrl: 'http://your.domain.com/checkout',
+    callbackUrl: `http://your.domain.com/checkout?gate=${ipg.Types.Melli}`,
     currencyIsToman: false,
   },
 };
@@ -179,13 +177,12 @@ ipg
   .catch((error) => console.log(error));
 ```
 
-### API-TODO
+### Implemented Gateways 
 
 - [x] Mellat
 - [x] Melli
-- [ ] Pasargod
+- [ ] Pasargad
 - [ ] Saderat
-- [ ] ZarinPal
 
 ## Contributing
 
