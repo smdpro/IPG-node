@@ -1,3 +1,2 @@
-const MelliGateway=require('./melliGateway');
+module.exports = require('./melliGateway');
 
-module.exports = MelliGateway;

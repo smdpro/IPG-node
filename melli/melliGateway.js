@@ -11,7 +11,7 @@ module.exports = {
         `${config.credentail.TerminalId};${orderId};${Amount}`,
         config.credentail.TerminalKey
       );
-      let data = {
+      let param = {
         TerminalId: config.credentail.TerminalId,
         MerchantId: config.credentail.MerchantId,
         Amount: Amount,
@@ -21,12 +21,12 @@ module.exports = {
         OrderId: orderId,
       };
       helper
-        .requestPayment(data)
-        .then((result) => {
+        .requestPayment(param)
+        .then(({data}) => {
           resolve({
-            success: result.ResCode == 0,
-            message: MESSAGES.PaymentRequest[result.ResCode],
-            ...result,
+            success: data.ResCode == 0,
+            message: data.Description,//MESSAGES.PaymentRequest[data.ResCode],
+            ...data,
           });
         })
         .catch((error) => reject(error));
@@ -35,17 +35,17 @@ module.exports = {
 
   verify: (token, config) => {
     return new Promise((resolve, reject) => {
-      let verifyData = {
+      let param = {
         Token: token,
         SignData: helper.signingData(token, config.credentail.TerminalKey),
       };
       helper
-        .verifyPayment(verifyData)
-        .then((result) => {
+        .verifyPayment(param)
+        .then(({data}) => {
           resolve({
-            success: result.ResCode == 0,
-            message: MESSAGES.Verify[result.ResCode],
-            ...result,
+            success: data.ResCode == 0,
+            message: data.Description,//MESSAGES.Verify[data.ResCode],
+            ...data,
           });
         })
         .catch((error) => reject(error));
@@ -62,7 +62,7 @@ module.exports = {
         `${param.retrivalRef};${Amount};${config.credentail.TerminalId};${param.systemTraceNo};${RefundAmount};${param.token}`,
         config.credentail.TerminalKey
       );
-      let data = {
+      let regParam = {
         RetrievalRefNo: param.retrivalRefNo,
         Amount: Amount,
         TerminalId: config.credentail.TerminalId,
@@ -73,21 +73,24 @@ module.exports = {
       };
 
       helper
-        .registerRefund(data)
-        .then((dt) => {
-          if (dt && dt.ResponseCode == 1010) {
+        .registerRefund(regParam)
+        .then(({data}) => {
+          if (data.ResponseCode == 1010) {
             let nextSignData = helper.signingData(
-              `${dt.RefundId}`,
+              `${data.RefundId}`,
               config.credentail.TerminalKey
             );
-            let nextData = { RefundId: dt.RefundId, SignData: nextSignData };
+            let nextData = {
+              RefundId: data.RefundId,
+              SignData: nextSignData,
+            };
             helper
               .confirmRefund(nextData)
               .then((result) => {
-                if (result && result.ResponseCode == 1010) {
+                if (result.data && result.data.ResponseCode == 1010) {
                   return resolve({
                     success: true,
-                    message: MESSAGES.refund[result.ResponseCode],
+                    message: result.data.ResponseMessage,
                     ...result,
                   });
                 } else {
@@ -96,14 +99,21 @@ module.exports = {
                     .then((nextResult) => {
                       return resolve({
                         success: true,
-                        message: MESSAGES.refund[result.ResponseCode],
-                        ...nextResult,
+                        message: nextResult.data.ResponseMessage,
+                        ...nextResult.data,
                       });
                     })
                     .catch((error) => reject(error));
                 }
               })
               .catch((error) => reject(error));
+          }
+          else {
+            return resolve({
+              success: false,
+              message: data.ResponseMessage,
+              ...data,
+            });
           }
         })
         .catch((error) => reject(error));

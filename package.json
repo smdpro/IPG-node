@@ -4,15 +4,23 @@
   "description": "Iranian payment gateway",
   "main": "index.js",
   "scripts": {
-    "pub": "git add . && git commit -m \"Updates\" && npm version patch && npm run build && npm publish",
+    "pub": "git add . && git commit -m \"Updates\" && npm version patch && npm publish",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/smdpro/IPG-node.git"
   },
-  "author": "",
-  "license": "ISC",
+  "keywords": [
+        "gateway",
+        "payment",
+        "melli",
+        "mellat",
+        "sadad",
+        "behpardakht"
+    ],
+  "author": "Samad Rahimi",
+  "license": "MIT",
   "bugs": {
     "url": "https://github.com/smdpro/IPG-node/issues"
   },

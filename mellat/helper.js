@@ -9,8 +9,8 @@ module.exports = {
           wsdl_headers: { namespace: 'http://interfaces.core.sw.bps.com/' },
         },
         function (error, client) {
-          if (error) return reject({ client: null, error });
-          resolve({ client, error: null });
+          if (error) return reject(error);
+          resolve(client);
         }
       );
     }),
