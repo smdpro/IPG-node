@@ -1,6 +1,6 @@
 {
   "name": "ipg-node",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Iranian payment gateway",
   "main": "index.js",
   "scripts": {
