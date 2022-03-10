@@ -86,21 +86,21 @@ module.exports = {
             };
             helper
               .confirmRefund(nextData)
-              .then((result) => {
-                if (result.data && result.data.ResponseCode == 1010) {
+              .then(({data}) => {
+                if (data.ResponseCode == 1010) {
                   return resolve({
                     success: true,
-                    message: result.data.ResponseMessage,
-                    ...result,
+                    message: data.ResponseMessage,
+                    ...data,
                   });
                 } else {
                   helper
                     .cancelRefund(nextData)
-                    .then((nextResult) => {
+                    .then(({data}) => {
                       return resolve({
                         success: true,
-                        message: nextResult.data.ResponseMessage,
-                        ...nextResult.data,
+                        message: data.ResponseMessage,
+                        ...data,
                       });
                     })
                     .catch((error) => reject(error));
