@@ -2,8 +2,8 @@
 
 Iranian payment gateway
 
-[![npm version](https://badge.fury.io/js/mellat-checkout.svg)](https://badge.fury.io/js/mellat-checkout)
-[![MIT License][license-image]][license-url]
+[![npm version](https://badge.fury.io/js/ipg-node.svg)](https://badge.fury.io/js/ipg-node)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 Unofficially implementing Iranian payment gateways in Node.JS
 
