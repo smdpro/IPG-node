@@ -1,6 +1,6 @@
 const mellatGateway = require('./mellat');
 const melliGateway = require('./melli');
-const Types = Object.freeze({ Mellat: 'mellat', Melli: 'melli' });
+const Types = Object.freeze({ Mellat: 'mellat', Melli: 'melli', Saderat: 'saderat' });
 
 let config = {
   mellat: {
@@ -17,6 +17,13 @@ let config = {
       TerminalId: '',
       MerchantId: '',
       TerminalKey: '',
+    },
+    callbackUrl: '',
+    currencyIsToman: false,
+  },
+  saderat: {
+    credentail: {
+      terminalID: '',
     },
     callbackUrl: '',
     currencyIsToman: false,
