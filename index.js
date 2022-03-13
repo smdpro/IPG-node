@@ -1,6 +1,11 @@
 const mellatGateway = require('./mellat');
 const melliGateway = require('./melli');
-const Types = Object.freeze({ Mellat: 'mellat', Melli: 'melli', Saderat: 'saderat' });
+const saderatGateway = require('./saderat');
+const Types = Object.freeze({
+  Mellat: 'mellat',
+  Melli: 'melli',
+  Saderat: 'saderat',
+});
 
 let config = {
   mellat: {
@@ -31,9 +36,6 @@ let config = {
 };
 
 module.exports = {
-  // if (!conf) return null;
-  // let config = conf;
-  // return {
   Types,
   config,
   request: (gatewayType, amount, additionalData = '') => {
@@ -41,14 +43,16 @@ module.exports = {
       return mellatGateway.request(amount, config.mellat, additionalData);
     if (gatewayType == Types.Melli)
       return melliGateway.request(amount, config.melli);
+    if (gatewayType == Types.Saderat)
+      return saderatGateway.request(amount, config.saderat);
   },
   verify: (gatewayType, param) => {
-    if (gatewayType == Types.Mellat) {
+    if (gatewayType == Types.Mellat)
       return mellatGateway.verify(param, config.mellat);
-    }
-    if (gatewayType == Types.Melli) {
+    if (gatewayType == Types.Melli)
       return melliGateway.verify(param.token, config.melli);
-    }
+    if (gatewayType == Types.Saderat)
+      return saderatGateway.verify(param.digitalreceipt, config.saderat);
   },
   refund: (gatewayType, param) => {
     if (gatewayType == Types.Mellat) {

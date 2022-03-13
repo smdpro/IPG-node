@@ -5,12 +5,12 @@ const MESSAGES = require('./codes');
 module.exports = {
   request: (amount, config,payload='') => {
     return new Promise((resolve, reject) => {
-      let amount = config.currencyIsToman ? amount * 10 : amount;
+      let _amount = config.currencyIsToman ? amount * 10 : amount;
       let invoiceID = Number(moment().format('YMMDDHHmmSS'));
       
       let param = {
         terminalID: config.credentail.terminalID,
-        amount,
+        amount:_amount,
         callbackURL: config.callbackUrl,
         invoiceID,
         payload
