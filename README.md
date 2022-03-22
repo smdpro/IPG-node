@@ -43,6 +43,13 @@ ipg.config = {
     callbackUrl: `http://your.domain.com/checkout?gate=${ipg.Types.Melli}`,
     currencyIsToman: false,
   },
+  saderat: {
+    credentail: {
+      terminalID: process.env.MELLI_TERMINALID,
+    },
+    callbackUrl: `http://your.domain.com/checkout?gate=${ipg.Types.Saderat}`,
+    currencyIsToman: false,
+  },
 };
 ```
 
@@ -80,6 +87,24 @@ ipg
       // save invoice
     } else {
       // result.ResCode,
+      // result.message
+    }
+  })
+  .catch((error) => console.log(error));
+```
+#### Saderat:
+
+```javascript
+ipg
+  .request(ipg.Types.Saderat, amount)
+  .then((result) => {
+    if (result.success) {
+      // result.AccessToken,
+      
+      // ....
+      // save invoice
+    } else {
+      // result.Status,
       // result.message
     }
   })
@@ -182,8 +207,8 @@ ipg
 
 - [x] Mellat
 - [x] Melli
+- [x] Saderat
 - [ ] Pasargad
-- [ ] Saderat
 
 ## Contributing
 

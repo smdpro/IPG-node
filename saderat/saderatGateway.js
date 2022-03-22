@@ -1,6 +1,5 @@
 const moment = require('moment');
 const helper = require('./helper');
-const MESSAGES = require('./codes');
 
 module.exports = {
   request: (amount, config,payload='') => {
@@ -44,7 +43,7 @@ module.exports = {
         .catch((error) => reject(error));
     });
   },
-
+  
   // refund: (param, config) => {
   //   return new Promise((resolve, reject) => {
       

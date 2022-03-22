@@ -18,6 +18,13 @@ ipg.config = {
     callbackUrl: `http://your.domain.com/checkout?gate=${ipg.Types.Melli}`,
     currencyIsToman: false,
   },
+  saderat: {
+    credentail: {
+      terminalID: process.env.MELLI_TERMINALID,
+    },
+    callbackUrl: `http://your.domain.com/checkout?gate=${ipg.Types.Saderat}`,
+    currencyIsToman: false,
+  },
 };
 
 module.exports=ipg;

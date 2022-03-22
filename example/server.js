@@ -23,6 +23,14 @@ app.get('/payment', (req, res) => {
             token: result.Token,
           });
         }
+        if (req.boy.gateway == gateway.Types.Saderat) {
+          res.status(200).json({
+            redirectUrl: `https://sepehr.shaparak.ir:8080/Pay`,
+            method: 'post',
+            TerminalID: gateway.config.saderat.credentail.terminalID,
+            token: result.AccessToken,
+          });
+        }
       } else {
         /* melli
         //  success: false,
@@ -69,6 +77,19 @@ app.get('/checkout', (req, res) => {
       // token: '0001B1E83962A3DD0EC2872824C071245436ABD08951DD03F5FE',
       // ResCode: '0',
       // OrderId: '20220212134400',    };
+    };
+  }
+  if (gateName == gateway.Types.Saderat) {
+    param = {
+      // respcode: req.body.respcode,
+      // respmsg: req.body.respmsg,
+      // amount: req.body.amount,
+      // invoiceid: req.body.invoiceid,
+      // reacenumber: req.body.reacenumber,
+      // billid: req.body.billid,
+      // payid: req.body.payid,
+      token: req.body.digitalreceipt,
+      
     };
   }
   gateway
