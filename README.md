@@ -208,7 +208,7 @@ ipg
 - [x] Mellat
 - [x] Melli
 - [x] Saderat
-- [ ] Pasargad
+- [x] Nexpay
 
 ## Contributing
 
